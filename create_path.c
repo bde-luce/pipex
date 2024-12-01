@@ -49,17 +49,18 @@ static char	**find_path(char **envp)
 	char	**path_env;
 
 	i = 0;
-	while (envp[i] != NULL)
+	while (envp[i])
 	{
 		if (ft_strncmp(envp[i], "PATH=", sizeof(char) * 5) == 0)
 		{
 			path_trim = ft_strtrim(envp[i], "PATH=");
 			path_env = ft_split(path_trim, ':');
 			free(path_trim);
+			return (path_env);
 		}
 		i++;
 	}
-	return (path_env);
+	return (NULL);
 }
 
 char	*create_path(char *function, char **envp)
@@ -71,7 +72,7 @@ char	*create_path(char *function, char **envp)
 
 	path_env = find_path(envp);
 	i = 0;
-	while (path_env[i] != NULL)
+	while (path_env && path_env[i])
 	{
 		path_join = ft_strjoin(path_env[i], "/");
 		path = ft_strjoin(path_join, function);
@@ -84,7 +85,7 @@ char	*create_path(char *function, char **envp)
 		free(path);
 		i++;
 	}
-	perror("Error not able to execute or find function");
+	write(2, "Error not able to execute or find function\n", 43);
 	free_array(path_env);
 	return (NULL);
 }

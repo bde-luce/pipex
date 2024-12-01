@@ -14,8 +14,11 @@
 
 void	exec_1sthalf(int *fd_pipe, char **argv, char **envp)
 {
-	dup2(fd_infile(argv), STDIN_FILENO);
-	close(fd_infile(argv));
+	int fd_in;
+
+	fd_in = fd_infile(argv);
+	dup2(fd_in, STDIN_FILENO);
+	close(fd_in);
 	dup2(fd_pipe[1], STDOUT_FILENO);
 	close(fd_pipe[0]);
 	close(fd_pipe[1]);
@@ -42,7 +45,6 @@ void	pipe_loop(int *fd_pipe, int *fd_next_pipe, char *argument, char **envp)
 	}
 	close(fd_pipe[0]);
 	close(fd_pipe[1]);
-	wait(NULL);
 }
 
 void	exec_mid(int (*fd_pipe)[2], int argc, char **argv, char **envp)
@@ -57,15 +59,19 @@ void	exec_mid(int (*fd_pipe)[2], int argc, char **argv, char **envp)
 		(*fd_pipe)[0] = fd_next_pipe[0];
 		(*fd_pipe)[1] = fd_next_pipe[1];
 	}
+	wait(NULL);
 }
 
 void	exec_2ndhalf(int *fd_pipe, int argc, char **argv, char **envp)
 {
+	int fd_out;
+
+	fd_out = fd_outfile(argc, argv);
 	dup2(fd_pipe[0], STDIN_FILENO);
 	close(fd_pipe[0]);
 	close(fd_pipe[1]);
-	dup2(fd_outfile(argc, argv), STDOUT_FILENO);
-	close(fd_outfile(argc, argv));
+	dup2(fd_out, STDOUT_FILENO);
+	close(fd_out);
 	exec_command(argv[argc -2], envp);
 }
 

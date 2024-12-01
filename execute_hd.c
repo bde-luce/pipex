@@ -47,10 +47,13 @@ void	exec_mid_hd(int (*fd_pipe)[2], int argc, char **argv, char **envp)
 
 void	child_proc2(int *fd_pipe2, int argc, char **argv, char **envp)
 {
+	int	fd_append;
+
+	fd_append = fd_appendfile(argc, argv);
 	dup2(fd_pipe2[0], STDIN_FILENO);
 	close(fd_pipe2[0]);
 	close(fd_pipe2[1]);
-	dup2(fd_appendfile(argc, argv), STDOUT_FILENO);
-	close(fd_appendfile(argc, argv));
+	dup2(fd_append, STDOUT_FILENO);
+	close(fd_append);
 	exec_command(argv[argc - 2], envp);
 }
